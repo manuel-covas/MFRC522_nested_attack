@@ -65,7 +65,8 @@ void rc522_tcp_listen(int port) {
 
 
 void rc522_tcp_spi_transcieve(uint8_t* data, uint8_t length) {
-
+    if (length < 1) return;
+    
     uint8_t* operation = malloc(length + 2);
     rc522_tcp_operation_result_t result = 0;
 
