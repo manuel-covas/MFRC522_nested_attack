@@ -11,6 +11,19 @@
 
 /*#############################################################################################################
 
+Section:                                          ~sleep function
+
+#############################################################################################################*/
+
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+
+/*#############################################################################################################
+
 Section:                                          ~macros
 
 #############################################################################################################*/
@@ -60,19 +73,17 @@ RC522::RC522()
 
     
 #if RC522_WIRE
-    
     wiringPiSetup();
-
     wiringPiSPISetup( CHANNEL, SPI_SPEED );
+#endif
 
+#if RC522_TCP
+    rc522_tcp_listen(45000);
 #endif
 
     resetPCD();
-
     setupPCD();
-
     antennaOn();
-
 }
 
 /*=============================================================================================================
@@ -124,6 +135,38 @@ void RC522::resetPCD()
     }// end hard/soft reset
     
 #endif// wire
+
+#if RC522_TCP
+
+    if (rc522_tcp_rst_gpio_get() == GPIO_LOW) {  // The MFRC522 chip is in power down mode. Perform a hard reset.
+        #if RC522_DBG
+	        printf("hard reset\n");
+	    #endif
+
+        if (rc522_tcp_rst_gpio_set(GPIO_HIGH) != OPERATION_OK) {  // Exit power down mode. This triggers a hard reset.
+            printf("rc522_tcp_rst_gpio_set(GPIO_HIGH) failed.\n");
+            exit(0);
+        }
+        
+        // Section 8.8.2 in the datasheet says the oscillator start-up time is the start up time of the crystal + 37,74μs. Let us be generous: 50ms.
+	    sleep(0.050);
+
+    }else{  // Perform a soft reset.
+        
+        #if RC522_DBG
+        printf("soft reset\n");
+        #endif
+
+        m_val = SOFT_RESET;
+        writeRegister(CMD_REG, &m_val);
+        sleep(0.050);
+
+        byte cmdStatus;  // wait until power down bit is cleared
+        do { readRegister(CMD_REG, &cmdStatus); } while(cmdStatus & (1<<4));
+    }
+
+#endif
+
 }// resetPCD
     
 
@@ -567,7 +610,9 @@ void RC522::writeRegister( byte reg, byte *val, const byte len /*=1*/ )
 #if RC522_WIRE    
     wiringPiSPIDataRW(CHANNEL, data, len+1 );
 #endif
-    
+#if RC522_TCP
+    rc522_tcp_spi_transcieve(data, len+1);
+#endif
 }
 
 /*=============================================================================================================
@@ -587,6 +632,9 @@ void RC522::readRegister( byte reg, byte *buffer, byte nrOfBytes /*= 1*/ )
 #if RC522_WIRE
     wiringPiSPIDataRW(CHANNEL, buffer, 1 );// 1st byte back is trash
 #endif
+#if RC522_TCP
+    rc522_tcp_spi_transcieve(buffer, 1);
+#endif
     
     for( int i = 0; i<nrOfBytes-1; i++ )// if more than 1 byte is to be read
     {
@@ -597,6 +645,9 @@ void RC522::readRegister( byte reg, byte *buffer, byte nrOfBytes /*= 1*/ )
 
 #if RC522_WIRE
     wiringPiSPIDataRW(CHANNEL, buffer, nrOfBytes);
+#endif
+#if RC522_TCP
+    rc522_tcp_spi_transcieve(buffer, nrOfBytes);
 #endif
 
 #if RC522_DBG

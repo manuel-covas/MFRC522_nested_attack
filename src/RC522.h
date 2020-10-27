@@ -14,6 +14,7 @@
  */
 #define RC522_DBG	0
 #define RC522_WIRE	0
+#define RC522_TCP	1
 
 #ifndef _RC522_H_
 #define _RC522_H_
@@ -38,6 +39,12 @@ Section:                                          ~libs
 
 #endif
 
+#if RC522_TCP
+
+#include "rc522_tcp.h"
+
+#endif
+
 /*#############################################################################################################
 
 Section:                                          ~literals and defines
@@ -48,7 +55,7 @@ Section:                                          ~literals and defines
  * raspberry	   (wirepi) pin	      MFRC522
  * ------------------------------------------------------------
  * Reset		5		RST
- * SPI CE0	     	10		SSN (slave select)
+ * SPI CE0	    10		SSN (slave select)
  * SPI MOSI	  	12		MOSI
  * SPI MISO		13		MISO
  * SPI SCK		14		SCK
@@ -75,7 +82,7 @@ class RC522
 public:
 
     /*-------------------------------------- init PCD  ---------------------------------------*/
-
+    
     RC522();
     void resetPCD();
     void setupPCD();
