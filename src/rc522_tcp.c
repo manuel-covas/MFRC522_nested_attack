@@ -67,7 +67,7 @@ void rc522_tcp_listen(int port) {
 void rc522_tcp_spi_transcieve(uint8_t* data, uint8_t length) {
 
     uint8_t* operation = malloc(length + 2);
-    rc522_tcp_operation_result_t result;
+    rc522_tcp_operation_result_t result = 0;
 
     operation[0] = SPI_TRANSCEIVE;       // Operation code
     operation[1] = length;               // SPI Transceive length
@@ -93,8 +93,8 @@ rc522_tcp_gpio_state_t rc522_tcp_rst_gpio_get() {
     operation[0] = RST_GPIO_GET;         // Operation code
     operation[1] = 0;                    // Ignored argument
 
-    rc522_tcp_operation_result_t result; // Operation result
-    rc522_tcp_gpio_state_t gpio_state;   // GPIO state
+    rc522_tcp_operation_result_t result = 0; // Operation result
+    rc522_tcp_gpio_state_t gpio_state = 0;   // GPIO state
 
     write(connection_fd, operation, 2);
     read(connection_fd, &result, 1);     // Read operation result
@@ -111,7 +111,7 @@ rc522_tcp_gpio_state_t rc522_tcp_rst_gpio_get() {
 rc522_tcp_operation_result_t rc522_tcp_rst_gpio_set(rc522_tcp_gpio_state_t state) {
 
     uint8_t* operation = malloc(2);
-    rc522_tcp_operation_result_t result;
+    rc522_tcp_operation_result_t result = 0;
 
     operation[0] = RST_GPIO_SET;     // Operation code
     operation[1] = state;            // GPIO state to set
