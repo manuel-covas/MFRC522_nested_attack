@@ -67,15 +67,22 @@ void rc522_tcp_listen(int port) {
 void rc522_tcp_spi_transcieve(uint8_t* data, uint8_t length) {
 
     uint8_t* operation = malloc(length + 2);
+    rc522_tcp_operation_result_t result;
 
     operation[0] = SPI_TRANSCEIVE;       // Operation code
     operation[1] = length;               // SPI Transceive length
     memcpy(operation + 2, data, length); // Data to tranceive on SPI
 
     write(connection_fd, operation, length + 2);
+    read(connection_fd, &result, 1);     // Read operation result
     read(connection_fd, data, length);   // Read SPI response
 
     free(operation);
+
+    if (result != OPERATION_OK) {
+        printf("SPI_TRANSCEIVE failed. Operation result: %02X\n", result);
+        exit(result);
+    }
 }
 
 
