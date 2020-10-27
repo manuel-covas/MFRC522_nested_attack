@@ -7,14 +7,14 @@
 **************************************************************************************************************/
 
 #include "MFrec.h"
+#include <string.h>
 
-int main()
-{
- 
-    MFrec com;
+int main() {
     
-    com.crackKey( AUTHENT_A, 63, 6 );
+    MFrec com;
+    byte key[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
+    com.crackKey(AUTHENT_A, 63, 3, key);
     com.stop();
     
     return 0;
