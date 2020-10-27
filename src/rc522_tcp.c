@@ -96,7 +96,7 @@ rc522_tcp_gpio_state_t rc522_tcp_rst_gpio_get() {
     rc522_tcp_operation_result_t result; // Operation result
     rc522_tcp_gpio_state_t gpio_state;   // GPIO state
 
-    write(connection_fd, &operation, 2);
+    write(connection_fd, operation, 2);
     read(connection_fd, &result, 1);     // Read operation result
     read(connection_fd, &gpio_state, 1); // Read gpio state
 
@@ -116,7 +116,7 @@ rc522_tcp_operation_result_t rc522_tcp_rst_gpio_set(rc522_tcp_gpio_state_t state
     operation[0] = RST_GPIO_SET;     // Operation code
     operation[1] = state;            // GPIO state to set
 
-    write(connection_fd, &operation, 2);
+    write(connection_fd, operation, 2);
     read(connection_fd, &result, 1); // Read operation result
     
     free(operation);
