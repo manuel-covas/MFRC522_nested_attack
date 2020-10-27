@@ -149,7 +149,7 @@ void RC522::resetPCD()
         }
         
         // Section 8.8.2 in the datasheet says the oscillator start-up time is the start up time of the crystal + 37,74μs. Let us be generous: 50ms.
-	    sleep(0.050);
+	    usleep(50*1000);
 
     }else{  // Perform a soft reset.
         
@@ -159,7 +159,7 @@ void RC522::resetPCD()
 
         m_val = SOFT_RESET;
         writeRegister(CMD_REG, &m_val);
-        sleep(0.050);
+        usleep(50*1000);
 
         byte cmdStatus;  // wait until power down bit is cleared
         do { readRegister(CMD_REG, &cmdStatus); } while(cmdStatus & (1<<4));
