@@ -142,7 +142,7 @@ void RC522::resetPCD()
         #if RC522_DBG
 	        printf("hard reset\n");
 	    #endif
-
+        
         if (rc522_tcp_rst_gpio_set(GPIO_HIGH) != OPERATION_OK) {  // Exit power down mode. This triggers a hard reset.
             printf("rc522_tcp_rst_gpio_set(GPIO_HIGH) failed.\n");
             exit(0);
@@ -302,13 +302,15 @@ RETURN:
 
 void RC522::initCom()
 {
-   
-    while( 1 )
-    {
+    while( 1 ) {
+
 	#if RC522_WIRE
 	delay(10);
 	#endif
-	
+	#if RC522_TCP
+	usleep(10 * 1000);
+	#endif
+
 	if( !sendReqA() ) continue;
 
 	if( !anticollision() ) continue;
@@ -705,6 +707,10 @@ bool RC522::piccIO( byte command, byte nrOfBytesToSend, byte *data, byte len, by
 	#if RC522_WIRE
 	delay(1);// give time for the change of bitframing reg
 	#endif
+	#if RC522_TCP
+	usleep(1 * 1000);
+	#endif
+    
 	readRegister( BIT_FRAMING_REG, &tmp );
 	m_val = tmp | 0x80;
 	writeRegister( BIT_FRAMING_REG, &m_val );
@@ -727,6 +733,11 @@ bool RC522::piccIO( byte command, byte nrOfBytesToSend, byte *data, byte len, by
 	#if RC522_DBG
 	delay(1);
 	#endif
+	#endif
+    #if RC522_TCP
+    #if RC522_DBG
+	usleep(1 * 1000);
+    #endif
 	#endif
     }// while
 

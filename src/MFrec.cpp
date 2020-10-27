@@ -8,6 +8,12 @@
 
 #include "MFrec.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 
 /*=============================================================================================================
 
@@ -234,6 +240,9 @@ bool MFrec::crackKey( byte command, byte blockAddr_e, byte blockAddr_a, byte *ke
 	    #if RC522_WIRE
 	    delay(delayTime);
 	    #endif
+		#if RC522_TCP
+		usleep(delayTime * 1000);
+		#endif
 	}// for d
 
 	/*-------------------------------------- clean up  ---------------------------------------*/
@@ -458,6 +467,9 @@ void MFrec::resetPICC( int waitTime )
     	antennaOff();// reset communication for new authentications
 	#if RC522_WIRE
 	delay(waitTime);
+	#endif
+	#if RC522_TCP
+	usleep(waitTime * 1000);
 	#endif
 	antennaOn();
 }
