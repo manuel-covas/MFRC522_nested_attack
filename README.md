@@ -1,6 +1,8 @@
 # MFRC522_nested_attack
 mifare nested authentication attack with the MFRC522 reader
 
+FORK: This is working with an esp32 exposing the RC522 but I haven't gotten it to work yet, the ic doesn't transceive anything idk fifo length register always shows 0.
+
 PREFACE:
 
 Mifare classic cards are known to have several vulnerabilities and should not be trusted with any sensitive information. Even so I've seen an estimate of 1B cards that is/has been in use and it just so happens that my NTNU student id is one of them. Naturally I got curious about what was on it and since some sectors where using a default key I went with the nested authentication attack to find out. To do this I wanted to use a raspberry pi and the RC522 RFID reader from an arduino kit.  
